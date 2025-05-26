@@ -20,7 +20,9 @@ harness = true         # Use libtest harness.
 crate-type = ["lib"]   # The crate types to generate.
 required-features = [] # Features required to build this target (N/A for lib).
 
-# [features]
+[features]
+# Will include structs used to auto-generate code.
+internal_doc = []
 
 # [lints]
 
@@ -29,6 +31,13 @@ required-features = [] # Features required to build this target (N/A for lib).
 # [workspace]
 
 [dependencies]
+futures = "0.3.31"
+k8s-openapi = { version = "0.25.0", features = ["v1_33"] }
+kube = { version = "1.0.0", features = ["derive"] }
+kube-derive = "1.0.0"
+schemars = "0.8.22"
+serde = "1.0.219"
+serde_json = "1.0.140"
 
 # [badges]
 # # The `maintenance` table indicates the status of the maintenance of
