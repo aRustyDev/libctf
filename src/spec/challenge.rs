@@ -1,6 +1,10 @@
+use crate::spec::util::{ResourceRequestSpec, ResourceSpec};
 use kube_derive::CustomResource;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+
+impl ResourceRequestSpec for ChallengeRequestSpec {}
+impl ResourceSpec for ChallengeSpec {}
 
 /// IGNORE: Used to Auto-Generate Challenges
 #[derive(CustomResource, Deserialize, Serialize, Clone, Debug, JsonSchema)]
@@ -12,11 +16,11 @@ use serde::{Deserialize, Serialize};
     namespaced,
     doc = "Custom Kubernetes resource for 'Challenge' resource"
 )]
-pub struct DeriveResource {
-    info: String,
+pub struct ChallengeSpec {
+    pub info: String,
     #[schemars(length(min = 3))]
-    name: String,
-    replicas: i32,
+    pub name: String,
+    pub replicas: i32,
 }
 
 /// IGNORE: Used to Auto-Generate ChallengeRequests
@@ -29,7 +33,7 @@ pub struct DeriveResource {
     namespaced,
     doc = "Custom Kubernetes resource for 'ChallengeRequest' resource"
 )]
-pub struct DeriveResourceRequest {
+pub struct ChallengeRequestSpec {
     info: String,
     #[schemars(length(min = 3))]
     name: String,

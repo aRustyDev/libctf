@@ -1,34 +1,59 @@
-use http::request::Request;
+use crate::spec::challenge::{Challenge, ChallengeSpec};
+// use crate::spec::util::{ResourceRequestSpec, ResourceSpec};
+use context::Context;
+use hyper_util::rt::TokioExecutor;
 use kube::api::{DeleteParams, GetParams, Patch, PatchParams, PostParams};
+use kube::{Client, Config, client::ConfigExt};
 use serde::Serialize;
-use tower::BoxError;
+use tower::{BoxError, ServiceBuilder};
 
+pub const MAX_RETRIES: u32 = 3;
+
+/// Defines an interface for creating, reading, updating, and deleting (CRUD) resources.
 pub trait Crud {
+    // Challenge, Plugin, Flag, Verifier
+    /// Expects same output as `kube::api::Request::create()`
     fn create(
         &self,
+        ctx: &Context,
+        client: Client,
         pp: &PostParams,
-        data: Vec<u8>,
-    ) -> Result<Request<Vec<u8>>, kube::core::request::Error>;
+        data: ChallengeSpec,
+    ) -> impl Future<Output = Result<Challenge, kube::Error>> + Send;
+    /// Expects same output as `kube::api::Request::get()`
     fn read(
         &self,
+        ctx: &Context,
+        client: Client,
         name: String,
         gp: &GetParams,
-    ) -> Result<Request<Vec<u8>>, kube::core::request::Error>;
-    fn update<P: Serialize>(
+    ) -> impl Future<Output = Result<Challenge, kube::Error>> + Send;
+    /// Expects same output as `kube::api::Request::patch()`
+    fn update<P: Serialize + std::fmt::Debug + Send + Sync + Clone + 'static>(
         &self,
+        ctx: &Context,
+        client: Client,
         name: String,
         pp: &PatchParams,
         patch: &Patch<P>,
-    ) -> Result<Request<Vec<u8>>, kube::core::request::Error>;
+    ) -> impl Future<Output = Result<Challenge, kube::Error>> + Send;
+    /// Expects same output as `kube::api::Request::delete()`
     fn delete(
         &self,
+        ctx: &Context,
+        client: Client,
         name: String,
         dp: &DeleteParams,
-    ) -> Result<Request<Vec<u8>>, kube::core::request::Error>;
+    ) -> impl Future<Output = Result<Challenge, kube::Error>> + Send;
 }
 
-pub fn client() -> Result<kube::api::Request, BoxError> {
-    // Implementation of client function
-    let url = "";
-    Ok(kube::api::Request::new(url))
+/// Wrapper around `kube::api::Request`, creates a 'client' for working on Kubernetes resources.
+pub async fn client() -> Result<kube::Client, BoxError> {
+    let config = Config::infer().await?;
+    let service = ServiceBuilder::new()
+        .layer(config.base_uri_layer())
+        .option_layer(config.auth_layer()?)
+        .map_err(BoxError::from)
+        .service(hyper_util::client::legacy::Client::builder(TokioExecutor::new()).build_http());
+    Ok(kube::Client::new(service, config.default_namespace))
 }
