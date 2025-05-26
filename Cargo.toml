@@ -1,9 +1,9 @@
 [package]
 name = "libctf"
 description = "SDK intended for use with CTF-rs, but is designed to be repurposed by others to easily extend functionality for other CTF related projects"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
-license-file = "LICENSE"
+license = "AGPL-3.0-or-later"
 readme = "README.md"
 homepage = "https://github.com/arustydev/libctf"
 keywords = ["sdk", "ctf"]
@@ -20,9 +20,7 @@ harness = true         # Use libtest harness.
 crate-type = ["lib"]   # The crate types to generate.
 required-features = [] # Features required to build this target (N/A for lib).
 
-[features]
-# Will include structs used to auto-generate code.
-internal_doc = []
+# [features]
 
 # [lints]
 

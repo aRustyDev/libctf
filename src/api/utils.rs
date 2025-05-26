@@ -1,5 +1,5 @@
 use http::request::Request;
-use kube::api::{DeleteParams, GetParams, Patch, PatchParams, PostParams, WatchParams};
+use kube::api::{DeleteParams, GetParams, Patch, PatchParams, PostParams};
 use serde::Serialize;
 use tower::BoxError;
 

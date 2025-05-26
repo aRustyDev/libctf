@@ -4,7 +4,7 @@ use kube::api::{DeleteParams, GetParams, Patch, PatchParams, PostParams, WatchPa
 use kube::core::request::Error;
 use serde::Serialize;
 
-pub struct challenge {
+pub struct Challenge {
     pub id: String,
     pub name: String,
     pub description: String,
@@ -14,7 +14,7 @@ pub struct challenge {
     pub client: kube::api::Request,
 }
 
-impl Crud for challenge {
+impl Crud for Challenge {
     fn create(&self, pp: &PostParams, data: Vec<u8>) -> Result<Request<Vec<u8>>, Error> {
         self.client.create(pp, data)
     }
@@ -33,7 +33,7 @@ impl Crud for challenge {
         self.client.delete(&name, dp)
     }
 }
-impl challenge {
+impl Challenge {
     pub fn new(
         id: String,
         name: String,
@@ -42,7 +42,7 @@ impl challenge {
         category: String,
         flag: String,
     ) -> Self {
-        challenge {
+        Challenge {
             id,
             name,
             description,
@@ -52,10 +52,10 @@ impl challenge {
             client: client().unwrap(),
         }
     }
-    fn watch(&self, wp: &WatchParams, ver: &str) -> Result<Request<Vec<u8>>, Error> {
+    pub fn watch(&self, wp: &WatchParams, ver: &str) -> Result<Request<Vec<u8>>, Error> {
         self.client.watch(wp, ver)
     }
-    fn replace(
+    pub fn replace(
         &self,
         name: String,
         pp: &PostParams,
